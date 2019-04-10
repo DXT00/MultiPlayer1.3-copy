@@ -53,7 +53,7 @@ public class ViewPlayer : MonoBehaviour
 
     public void FixedUpdate()
     {
-        PlayerRigidbody.AddForce(Physics.gravity*5f, ForceMode.Acceleration);
+        PlayerRigidbody.AddForce(Physics.gravity*5f, ForceMode.Acceleration);//给player添加重力
         x += Input.GetAxis("Horizontal");
         z += Input.GetAxis("Vertical");
 

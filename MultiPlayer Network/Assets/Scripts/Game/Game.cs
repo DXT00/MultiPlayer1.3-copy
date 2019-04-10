@@ -41,7 +41,7 @@ public class Game : MonoBehaviour
     }
 
 
-    private void Update()
+    private void FixedUpdate()
     {
 
         if (networkManager.get_isConnect())
@@ -133,12 +133,15 @@ public class Game : MonoBehaviour
         currentPlayer.bind_networkManager(networkManager);
         GameObject instance=viewManager.spawn_view_player(currentPlayer_connectID);
 
-        CameraFollow.bind_currentViewPlayer(instance);
-
+        //CameraFollow.bind_currentViewPlayer(instance);
+        
         currentPlayer.viewPlayer = instance.GetComponent<ViewPlayer>();
+        CameraFollow.bind_currentViewPlayer(currentPlayer.viewPlayer);//MY
         currentPlayer.viewPlayer.Start();
         currentPlayer.viewPlayer.connectID = currentPlayer_connectID;
         currentPlayer.viewPlayer.bind_cameraFollow(CameraFollow);//MY
+        currentPlayer.viewPlayer.bind_playerInstance(instance);
+
 
         currentPlayer.bind_viewManager(viewManager);
         viewManager.viewPlayers.Add(currentPlayer_connectID, currentPlayer.viewPlayer);

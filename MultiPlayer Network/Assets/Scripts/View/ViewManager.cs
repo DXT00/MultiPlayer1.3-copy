@@ -10,7 +10,7 @@ public class ViewManager : MonoBehaviour
     Player currentPlayer;
     public GameObject player_prefabs;//ViewManager从prefabs中spawn players!!
     public Dictionary<int, ViewPlayer> viewPlayers = new Dictionary<int, ViewPlayer>();//存储localPlayer在本地模拟的其他viewPlayers  (clientID--->ViewPlayer)
-    Vector3 init = new Vector3(-74, 2, 37);
+    Vector3 init = new Vector3(-74, 1, 37);
     public float distBetweenViewplayers =0.1f;
 
     public GameObject spawn_view_player(int clientID)
@@ -75,17 +75,30 @@ public class ViewManager : MonoBehaviour
                 if (msg.msg_type == (int)RequestType.INPUT)
                 {
                     InputMessage Input_msg = msg as InputMessage;                    
-                    viewPlayer.Move(Input_msg.moving_x, Input_msg.moving_z, Input_msg.moving_y);
+                    viewPlayer.Move(Input_msg.moving_x, Input_msg.moving_z);
 
 
                     Debug.Log("executing frame----" + syncFrame.frame_count + " clientID " + clientID.ToString() + "..........is moving..."
                         +" dist_x =  "+Input_msg.moving_x*viewPlayer.get_speed()*Time.deltaTime+" dist_z= "+ Input_msg.moving_z * viewPlayer.get_speed() * Time.deltaTime
                         +"y = "+Input_msg.moving_y);
+
+                    //if (viewPlayer.connectID == currentPlayer.connectID)
+                    //{
+                    //    Vector3 cur_offset = new Vector3(0, 0, -8f);
+                    //    viewPlayer.camera.offset = cur_offset;
+                    //}
                 }
                 else if (msg.msg_type == (int)RequestType.ROTATE)
                 {
                     RotateMessage rot_msg =  msg as RotateMessage;
                     viewPlayer.Rotate(rot_msg.delta_x, rot_msg.delta_y);
+
+                    //if (viewPlayer.connectID == currentPlayer.connectID)
+                    //{
+                    //    viewPlayer.camera.transform.RotateAround(viewPlayer.transform.position, viewPlayer.transform.up, -rot_msg.delta_x);
+                    //    viewPlayer.camera.offset = viewPlayer.camera.transform.position - viewPlayer.transform.position;
+                    //}
+                       
                 }
                 else if (msg.msg_type == (int)RequestType.SPAWN)
                 {

@@ -71,6 +71,7 @@ public class Room : MonoBehaviour
     {
         for(int i = startframe; i < end; i++)
         {
+            Tool.Print("Room Broadcasting frame :" + i.ToString());
             Dictionary<int,List<Frame>> updateFrames = new Dictionary<int, List<Frame>>();
             updateFrames.Add(i, TotalFrames[i]);
             ReplyAskFrame replyAskFrame = new ReplyAskFrame(updateFrames);

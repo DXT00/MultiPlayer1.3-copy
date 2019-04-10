@@ -12,8 +12,9 @@ public class ViewPlayer : MonoBehaviour
     public int connectID;//与Player的connectID相同；
 
 
-    float speed = 50f;
-
+    readonly float speed = 60f;
+    readonly float rotate_speed = 10f;
+    readonly float gravity = 2f;
     public GameObject BulletPrefabs;
     public Transform bulletSpawn;
 
@@ -22,15 +23,17 @@ public class ViewPlayer : MonoBehaviour
 
     int touchTerrianMask;
     float max_y = 100f;
-    float last_y = 2f;
+
 
 
     float z = 0;
+    float y = 0;
+    float last_y = 2f;
     float x = 0;
 
 
- float mouse_sensitive = 30f;
-    float dist_sensitive = 20f;
+
+    // float dist_sensitive = 20f;
     float rot_x = 0;
     float rot_y = 0;
 
@@ -48,77 +51,50 @@ public class ViewPlayer : MonoBehaviour
         PlayerRigidbody.freezeRotation = true;
     }
 
-
     public void FixedUpdate()
     {
-
-        //  float _mouseX = Input.GetAxis("Mouse X");
-        //  float _mouseY = Input.GetAxis("Mouse Y");
-
-
+        PlayerRigidbody.AddForce(Physics.gravity*5f, ForceMode.Acceleration);
         x += Input.GetAxis("Horizontal");
         z += Input.GetAxis("Vertical");
-
-
-
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
             key_x1++;
             rot_x = 0;
-           // rot_y += _mouseY * mouse_sensitive;
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
             key_x2++;
             rot_x = 0;
-            // rot_y += _mouseY * mouse_sensitive;
         }
 
         if (Input.GetKeyUp(KeyCode.Q))
         {
-            rot_x += key_x1 * (-mouse_sensitive);
+            rot_x += key_x1 * (-rotate_speed);
             key_x1 = 0;
         }
         if (Input.GetKeyUp(KeyCode.E))
         {
-          
-            rot_x+= key_x2*(mouse_sensitive);
+            rot_x += key_x2 * (rotate_speed);
             key_x2 = 0;
-            // rot_y += _mouseY * mouse_sensitive;
         }
 
     }
 
     public List<CustomSyncMsg> get_local_input()
     {
-      
-        //Move(x, z);//不移动，等server发 replyframes
 
-        float my = move_on_the_ground();
-      
-        float y =  my;//这里指的y坐标,<100f时还没考虑（Ray 没有hit）
-
-
-        //if (Input.GetButton("Fire1"))
-        //    CmdShooting();
 
         msg_list.Clear();
         if (x != 0 || z != 0)
         {
-            CustomSyncMsg input_msg = new InputMessage(connectID, new Vector3(x, y, z));
+            CustomSyncMsg input_msg = new InputMessage(connectID, new Vector3(x, 0, z));
             msg_list.Add(input_msg);
         }
-       
+
         x = 0;
         z = 0;
-
-       
-
-
-     
-
-        
+ 
         if (rot_x != 0f || rot_y != 0f)
         {
             CustomSyncMsg rot_msg = new RotateMessage(connectID, new Vector2(rot_x, rot_y));
@@ -129,27 +105,36 @@ public class ViewPlayer : MonoBehaviour
 
         return msg_list;
     }
-    public void Move(float horizontal, float vertical, float y)
+    public void Move(float horizontal, float vertical)//, float y
     {
-        Vector3 movement = new Vector3(horizontal, 0f, vertical);
-        movement = movement.normalized * speed * 0.025f;// * Time.deltaTime;注意不能誠意deltaTime,
+  
+      //  Vector3 cur_pos= Transform.position +(-Transform.forward )* horizontal * speed * 0.025f + Transform.right * vertical * speed * 0.025f +(- Transform.up) * 100f;
 
-       
-        
 
-        Debug.Log("get_Rigidbody().position.x = " + PlayerRigidbody.position.x + "get_Rigidbody().position.y = " + PlayerRigidbody.position.y);
+        // PlayerRigidbody.MovePosition(cur_pos);
 
-       
+        PlayerRigidbody.AddForce((-Transform.forward) * horizontal * speed );
 
-        Transform.position = new Vector3(Transform.position.x, y, Transform.position.z);
-        PlayerRigidbody.MovePosition(Transform.position + movement);
-        Debug.Log("PlayerRigidbody.position + movement = " + (PlayerRigidbody.position + movement).x + "PlayerRigidbody.position + movement " + (PlayerRigidbody.position + movement).y);
+        PlayerRigidbody.AddForce(Transform.right * vertical * speed);
+       // PlayerRigidbody.AddForce((-Transform.up) * gravity);
+
+
+        //Transform.position = new Vector3(Transform.position.x, y, Transform.position.z);
+
+
+
+
+        // Debug.Log("PlayerRigidbody.position + movement = " + (PlayerRigidbody.position + movement).x + "PlayerRigidbody.position + movement " + (PlayerRigidbody.position + movement).y);
+
+        //PlayerRigidbody.AddForce(transform.right * horizontal * speed, ForceMode.Impulse);
+        //PlayerRigidbody.AddForce(transform.forward * vertical * speed, ForceMode.Impulse);
     }
 
     public void Rotate(float delta_x, float delta_y)
     {
         //现在只有绕自己的y轴旋转
-        Transform.Rotate(transform.up, delta_x, Space.Self);
+        Transform.Rotate(Vector3.up, delta_x, Space.Self);
+
         Tool.Print("......................Rotating .........delta_x = " + delta_x.ToString());
     }
 
@@ -197,7 +182,11 @@ public class ViewPlayer : MonoBehaviour
 
     public void bind_cameraFollow(CameraFollow cameraFollow)
     {
-        this.camera = cameraFollow;
+        camera = cameraFollow;
+    }
+    public void bind_playerInstance(GameObject Instance)
+    {
+        player_instance = Instance;
     }
 }
 

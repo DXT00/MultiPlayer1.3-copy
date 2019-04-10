@@ -12986,6 +12986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46d85eab2e3bdc445a022563c15d7c1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1001 &1126976666
 Prefab:
   m_ObjectHideFlags: 0
